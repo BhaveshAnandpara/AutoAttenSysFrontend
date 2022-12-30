@@ -1,0 +1,12 @@
+.attendSec{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.videoCon , .attenFeedbackCon{
+    display: block;
+    width: 100%;
+    height: 45vh;
+}
