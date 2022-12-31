@@ -4,6 +4,9 @@ import { Button } from '@mui/material'
 import videoSrc from '../../video_gameOn.mp4'
 import captureVideoFrame from "capture-video-frame";
 import axios from 'axios'
+import { convertLength } from '@mui/material/styles/cssUtils';
+import * as htmlToImage from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 
 export default function Attendance() {
 
@@ -41,7 +44,34 @@ export default function Attendance() {
 
         const img = document.createElement('img')
         img.setAttribute("src", frame.dataUri);
-        return img
+        return dataURItoBlob(frame.dataUri)
+
+    }
+
+    function dataURItoBlob(dataURI) {
+        // convert base64 to raw binary data held in a string
+        // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+        var byteString = atob(dataURI.split(',')[1]);
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to an ArrayBuffer
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        //Old Code
+        //write the ArrayBuffer to a blob, and you're done
+        //var bb = new BlobBuilder();
+        //bb.append(ab);
+        //return bb.getBlob(mimeString);
+
+        //New Code
+        return new Blob([ab], { type: mimeString });
+
 
     }
 
@@ -50,20 +80,19 @@ export default function Attendance() {
 
         startVideo()
 
-        setInterval(async () => {
+        setInterval(() => {
 
             const ss = capture()
 
+
             var data = new FormData();
-            data.append('name', 'Bhavesh Anandpara');
             data.append('frame', ss);
+
 
             var config = {
                 method: 'post',
-                url: 'http://127.0.0.1:8000/presentee',
-                headers: {
-                    "content-type" : "application/json, text/* "
-                },
+                url: 'http://localhost:8000/presentee',
+                headers: { 'content-type': 'multipart/form-data' },
                 data: data
             };
 
@@ -85,7 +114,7 @@ export default function Attendance() {
         <>
             <section className='attendSec border'>
                 <video ref={videoRef} id='video' className="videoCon border"> </video>
-                <Button variant="contained" color="error" onClick={() => { capture() }} > Stop Camera </Button>
+                <Button variant="contained" color="error"  > Stop Camera </Button>
                 <div className="attenFeedbackCon border">
                 </div>
             </section>
