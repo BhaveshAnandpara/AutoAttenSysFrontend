@@ -1,26 +1,56 @@
-import React from 'react';
-import './Enrollment.css'
-import { MDBBtn, MDBContainer, MDBCard, MDBCardBody, MDBInput, MDBCheckbox } from 'mdb-react-ui-kit';
+import React from 'react'
+import { Form, Field } from 'react-advanced-form'
+import { Input, Button } from 'react-advanced-form-addons'
 
-function App() {
-  return (
-    <MDBContainer fluid className='d-flex align-items-center justify-content-center bg-image' style={{ backgroundImage: 'url(https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp)' }}>
-      <div className='mask gradient-custom-3'></div>
-      <MDBCard className='m-5' style={{ maxWidth: '600px' }}>
-        <MDBCardBody className='px-5'>
-          <h2 className="text-uppercase text-center mb-5">Create an account</h2>
-          <MDBInput wrapperClass='mb-4' label='Your Name' size='lg' id='form1' type='text' />
-          <MDBInput wrapperClass='mb-4' label='Your Email' size='lg' id='form2' type='email' />
-          <MDBInput wrapperClass='mb-4' label='Password' size='lg' id='form3' type='password' />
-          <MDBInput wrapperClass='mb-4' label='Repeat your password' size='lg' id='form4' type='password' />
-          <div className='d-flex flex-row justify-content-center mb-4'>
-            <MDBCheckbox name='flexCheck' id='flexCheckDefault' label='I agree all statements in Terms of service' />
-          </div>
-          <MDBBtn className='mb-4 w-100 gradient-custom-4' size='lg'>Register</MDBBtn>
-        </MDBCardBody>
-      </MDBCard>
-    </MDBContainer>
-  );
+export default class RegistrationForm extends React.Component {
+  registerUser = ({ serialized, fields, form }) => {
+    return fetch('https://backend.dev', {
+      body: JSON.stringify(serialized)
+    })
+  }
+  
+  render() {
+    return (
+      <Form
+        action={this.registerUser}
+        onSubmitStart={this.props.onSubmitStart}>
+        <Field.Group name="primaryInfo">
+          <Input
+            name="userEmail"
+            type="email"
+            label="E-mail"
+            required />
+        </Field.Group>
+
+        <Input
+          name="userPassword"
+          type="password"
+          label="Password"
+          required />
+        <Input
+          name="confirmPassword"
+          type="password"
+          label="Confirm password"
+          required
+          skip />
+
+        <Field.Group name="primaryInfo">
+          <Input
+            name="firstName"
+            label="First name"
+            required={({ get }) => {
+              return !!get(['primaryInfo', 'lastName', 'value'])
+            }} />
+          <Input
+            name="lastName"
+            label="Last name"
+            required={({ get }) => {
+              return !!get(['primaryInfo', 'firstName', 'value'])
+            }} />
+        </Field.Group>
+
+        <Button primary>Register</Button>
+      </Form>
+    );
+  }
 }
-
-export default App;
