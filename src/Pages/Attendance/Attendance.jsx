@@ -1,9 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import './Attendance.css'
 import { Button } from '@mui/material'
+import videoSrc from '../../video_gameOn.mp4'
+import captureVideoFrame from "capture-video-frame";
+import axios from 'axios'
 
 export default function Attendance() {
 
+    const videoRef = useRef()
 
     async function startVideo() {
 
@@ -19,6 +23,7 @@ export default function Attendance() {
                     video.onloadedmetadata = (e) => {
                         video.play();
                     };
+
                 },
                 (err) => {
                     console.error(`The following error occurred: ${err}`);
@@ -30,21 +35,59 @@ export default function Attendance() {
 
     }
 
+    function capture() {
+
+        const frame = captureVideoFrame("video", "png");
+
+        const img = document.createElement('img')
+        img.setAttribute("src", frame.dataUri);
+        return img
+
+    }
+
+
     useEffect(() => {
 
-            startVideo()
+        startVideo()
+
+        setInterval(async () => {
+
+            const ss = capture()
+
+            var data = new FormData();
+            data.append('name', 'Bhavesh Anandpara');
+            data.append('frame', ss);
+
+            var config = {
+                method: 'post',
+                url: 'http://127.0.0.1:8000/presentee',
+                headers: {
+                    "content-type" : "application/json, text/* "
+                },
+                data: data
+            };
+
+            axios(config)
+                .then(function (response) {
+                    console.log(JSON.stringify(response.data));
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
 
 
+        }, 5000)
 
     }, [])
-    
+
 
     return (
         <>
             <section className='attendSec border'>
-                <video id='video' className="videoCon border"> </video>
-                <Button variant="contained" color="error"> Stop Camera </Button>
-                <div className="attenFeedbackCon border"> </div>
+                <video ref={videoRef} id='video' className="videoCon border"> </video>
+                <Button variant="contained" color="error" onClick={() => { capture() }} > Stop Camera </Button>
+                <div className="attenFeedbackCon border">
+                </div>
             </section>
         </>
     )
