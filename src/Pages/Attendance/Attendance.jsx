@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './Attendance.css'
 import { Button } from '@mui/material'
-import videoSrc from '../../video_gameOn.mp4'
 import captureVideoFrame from "capture-video-frame";
 import axios from 'axios'
 import * as ReactDOM from 'react-dom/client';
-import { convertLength } from '@mui/material/styles/cssUtils';
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 
 export default function Attendance() {
 
@@ -67,14 +63,26 @@ export default function Attendance() {
             ia[i] = byteString.charCodeAt(i);
         }
 
-        //Old Code
-        //write the ArrayBuffer to a blob, and you're done
-        //var bb = new BlobBuilder();
-        //bb.append(ab);
-        //return bb.getBlob(mimeString);
-
-        //New Code
         return new Blob([ab], { type: mimeString });
+
+
+    }
+
+    function handleStop() {
+
+        var config = {
+            method: 'get',
+            url: 'http://localhost:8000/stopProcess',
+            headers: {}
+        };
+
+        axios(config)
+            .then(function (response) {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
 
     }
@@ -135,7 +143,7 @@ export default function Attendance() {
             <section className='attendSec'>
                 <video ref={videoRef} id='video' className="videoCon"> </video>
 
-                <Button className='stopBtn' sx={{ marginBottom:'12px' }}  variant="contained" color="error"  > Stop Camera </Button>
+                <Button className='stopBtn' sx={{ marginBottom: '12px' }} variant="contained" color="error" onClick={() => { handleStop() }} > Stop Camera </Button>
 
                 <div className="attenFeedbackCon" id='attenFeedback' > </div>
 
