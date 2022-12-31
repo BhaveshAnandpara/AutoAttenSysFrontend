@@ -5,8 +5,20 @@
     align-items: flex-end;
 }
 
+
 .videoCon , .attenFeedbackCon{
     display: block;
     width: 100%;
     height: 45vh;
+}
+
+.attenFeedbackCon{
+    background: rgb(40, 40, 40);
+    border-radius: 8px;
+}
+
+.attendanceName{
+    color: rgb(86, 201, 86);
+    font-size: 18px;
+    margin-left: 12px;
 }

@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './Attendance.css'
 import { Button } from '@mui/material'
 import videoSrc from '../../video_gameOn.mp4'
 import captureVideoFrame from "capture-video-frame";
 import axios from 'axios'
+import * as ReactDOM from 'react-dom/client';
 import { convertLength } from '@mui/material/styles/cssUtils';
 import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
@@ -11,6 +12,9 @@ import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 export default function Attendance() {
 
     const videoRef = useRef()
+    const [presentStudents, setPresentStudents] = useState([])
+    const [attendance, setAttendance] = useState([])
+
 
     async function startVideo() {
 
@@ -98,7 +102,15 @@ export default function Attendance() {
 
             axios(config)
                 .then(function (response) {
-                    console.log(JSON.stringify(response.data));
+
+                    (response.data).forEach((ele) => {
+
+                        if (!presentStudents.includes(ele)) {
+                            console.log(ele);
+                            setPresentStudents([...presentStudents, ele])
+                            setAttendance([...attendance, <> <p className='attendanceName' > {ele} is present</p> </>])
+                        }
+                    })
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -110,13 +122,23 @@ export default function Attendance() {
     }, [])
 
 
+    useEffect(() => {
+
+        const attenFeedbackRoot = ReactDOM.createRoot(document.getElementById('attenFeedback'))
+        attenFeedbackRoot.render(attendance)
+
+    }, [attendance])
+
+
     return (
         <>
-            <section className='attendSec border'>
-                <video ref={videoRef} id='video' className="videoCon border"> </video>
-                <Button variant="contained" color="error"  > Stop Camera </Button>
-                <div className="attenFeedbackCon border">
-                </div>
+            <section className='attendSec'>
+                <video ref={videoRef} id='video' className="videoCon"> </video>
+
+                <Button className='stopBtn' sx={{ marginBottom:'12px' }}  variant="contained" color="error"  > Stop Camera </Button>
+
+                <div className="attenFeedbackCon" id='attenFeedback' > </div>
+
             </section>
         </>
     )
